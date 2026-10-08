@@ -1,0 +1,9 @@
+{
+ "name": "Camp 13",
+ "short_name": "Camp 13",
+ "start_url": "./",
+ "scope": "./",
+ "display": "fullscreen",
+ "background_color": "#07100d",
+ "theme_color": "#07100d"
+}

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#07100d">
+<title>Camp 13</title>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Camp 13">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<style>
+:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#07100d;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-text-size-adjust:100%}
+#game{position:fixed;inset:0;touch-action:none}
+#game canvas{display:block;width:100%;height:100%;touch-action:none;outline:none}
+#hud{position:fixed;inset:0;pointer-events:none;z-index:2}
+#top{position:absolute;top:calc(10px + var(--sat));left:calc(10px + var(--sal));right:calc(10px + var(--sar));display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.col{display:flex;flex-direction:column;gap:6px;align-items:flex-start;min-width:0}.col.r{align-items:flex-end}
+.tag{background:rgba(5,9,8,.72);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:7px 11px;font-size:12px;letter-spacing:.03em;white-space:nowrap}
+#status:empty{display:none}
+#status.good{border-color:#6fd39a;color:#c4f7d9}#status.act{border-color:#ffd166;color:#ffe7a8}#status.warn{border-color:#ff8a65;color:#ffd0c2}
+#detWrap{position:absolute;top:calc(12px + var(--sat));left:50%;transform:translateX(-50%);width:min(34vw,240px);text-align:center}
+#detLabel{font-size:11px;margin-bottom:4px;text-shadow:0 1px 3px #000;font-weight:700;letter-spacing:.04em}
+#detBar{height:9px;border-radius:6px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.18);overflow:hidden}
+#detFill{height:100%;width:0;background:#5ad19a;transition:width .1s linear,background .2s}
+#detWrap.sus #detLabel{color:#ffd166}#detWrap.alert #detLabel{color:#ff6b6b}
+#hint{position:absolute;left:50%;bottom:calc(200px + var(--sab));transform:translate(-50%,8px);opacity:0;transition:opacity .25s,transform .25s;background:rgba(5,9,8,.85);border:1px solid rgba(255,255,255,.2);padding:9px 14px;border-radius:12px;font-size:13px;max-width:min(92vw,520px);text-align:center}
+#hint.show{opacity:1;transform:translate(-50%,0)}
+#controls{position:absolute;left:calc(14px + var(--sal));right:calc(14px + var(--sar));bottom:calc(14px + var(--sab));display:flex;justify-content:space-between;align-items:flex-end;pointer-events:none}
+#joy{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.05) 0,rgba(255,255,255,.13) 100%);border:2px solid rgba(255,255,255,.22);pointer-events:auto;position:relative;touch-action:none;flex:none}
+#joy.on{border-color:rgba(255,255,255,.5)}
+#knob{position:absolute;left:50%;top:50%;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.34);border:1px solid rgba(255,255,255,.55);transform:translate(-50%,-50%);pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+#buttons{display:grid;grid-template-columns:repeat(2,auto);gap:10px;pointer-events:auto;align-items:center;justify-items:center}
+.btn{width:66px;height:66px;border-radius:50%;border:2px solid rgba(255,255,255,.26);background:rgba(7,10,13,.76);color:#fff;font:800 11px system-ui,-apple-system,sans-serif;letter-spacing:.04em;touch-action:none;pointer-events:auto;padding:0;transition:transform .08s,background .15s,border-color .15s,box-shadow .15s}
+.btn:active,.btn.press{transform:scale(.9);background:rgba(255,255,255,.25)}
+.btn.on{background:rgba(255,209,102,.3);border-color:#ffd166;color:#fff4d6}
+.btn.ready{border-color:#6fd39a;box-shadow:0 0 0 4px rgba(111,211,154,.35);background:rgba(40,90,60,.75)}
+#action{width:78px;height:78px;font-size:12px}
+#mute{pointer-events:auto;min-width:72px;min-height:56px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(5,9,8,.72);color:#fff;font:800 11px system-ui,-apple-system,sans-serif;letter-spacing:.04em;touch-action:none}
+#mute.off{color:#ff9e9e;border-color:#ff9e9e88}
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(0,0,0,.35),rgba(0,0,0,.8));z-index:5;padding:calc(10px + var(--sat)) calc(10px + var(--sar)) calc(10px + var(--sab)) calc(10px + var(--sal))}
+.overlay.hidden{display:none}
+.card{max-width:440px;width:100%;max-height:100%;overflow:auto;overscroll-behavior:contain;touch-action:pan-y;text-align:center;background:rgba(8,13,13,.9);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:22px 20px}
+.card h1{margin:0 0 4px;font-size:32px;letter-spacing:.12em;text-transform:uppercase;font-weight:900}
+.card .sub{margin:0 0 10px;color:#9fb7ad;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+.card p{color:#ccd3d4;font-size:13px;line-height:1.5;margin:8px 0}
+.keys{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left;font-size:12px;color:#b9c4c2;margin:12px 0 16px}
+.keys b{color:#fff;display:block;margin-bottom:3px;font-size:12px}
+.primary{border:0;border-radius:12px;padding:15px 26px;min-height:56px;background:#e1e6e6;color:#111;font:800 14px system-ui,-apple-system,sans-serif;letter-spacing:.05em;touch-action:manipulation;cursor:pointer}
+.primary:disabled{opacity:.5}
+#endScreen .card h1{font-size:30px}#endScreen.lose .card h1{color:#ff5a5a}#endScreen.win .card h1{color:#e8f0e8}
+.card{box-shadow:0 20px 60px rgba(0,0,0,.6)}
+@media (max-height:500px){
+  #joy{width:124px;height:124px}#knob{width:54px;height:54px}
+  .btn{width:60px;height:60px}#action{width:70px;height:70px}
+  #buttons{gap:8px}
+  #hint{bottom:calc(150px + var(--sab))}
+  .card{padding:14px 16px}.card h1{font-size:24px}.keys{margin:8px 0 10px}
+}
+@media (max-width:420px){.keys{grid-template-columns:1fr}#detWrap{top:calc(96px + var(--sat));width:56vw}}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="hud">
+  <div id="top">
+    <div class="col"><div class="tag">CAMP 13 · NACHT</div><div id="status" class="tag"></div></div>
+    <div class="col r"><div class="tag">Patrouillen: <b id="score">0 / 7</b></div><div class="tag">Lager: <b id="camp">0 / 2</b></div><button id="mute" type="button">TON AN</button></div>
+  </div>
+  <div id="detWrap"><div id="detLabel">Unentdeckt</div><div id="detBar"><div id="detFill"></div></div></div>
+  <div id="hint"></div>
+  <div id="controls">
+    <div id="joy"><div id="knob"></div></div>
+    <div id="buttons">
+      <button class="btn" id="lamp" type="button">LAMPE</button>
+      <button class="btn" id="hide" type="button">BUSCH</button>
+      <button class="btn" id="sprint" type="button">SPRINT</button>
+      <button class="btn" id="action" type="button">AKTION</button>
+    </div>
+  </div>
+</div>
+<div id="startScreen" class="overlay"><div class="card">
+  <h1>Camp 13</h1>
+  <div class="sub">Nacht · Nebel · sieben Patrouillen · zwei am Feuer</div>
+  <p>Sieben maskierte Patrouillen bewachen das Camp im Wald. Am Lagerfeuer sitzen zwei – sehen sie dich, rennen sie los und holen die Patrouille. Schalte alle lautlos von hinten aus. Wirst du gesehen, beginnt die Jagd.</p>
+  <div class="keys">
+    <div><b>Touch</b>Joystick: laufen<br>Bildschirm ziehen: Kamera<br>SPRINT halten · BUSCH · AKTION · LAMPE</div>
+    <div><b>Tastatur / Maus</b>WASD / Pfeile: laufen · Shift: Sprint<br>Maus ziehen (Doppelklick = Maus fangen)<br>E: Aktion · Q/F: Busch · L: Lampe · M: Ton</div>
+  </div>
+  <button id="start" class="primary" type="button" disabled>LÄDT …</button>
+</div></div>
+<div id="endScreen" class="overlay hidden"><div class="card">
+  <h1 id="endTitle">ENTDECKT</h1>
+  <p id="endText"></p>
+  <button id="restart" class="primary" type="button">NOCHMAL</button>
+</div></div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/examples/jsm/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}</script>
+<script type="module" src="game.js"></script>
+</body>
+</html>
