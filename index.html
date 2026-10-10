@@ -63,6 +63,11 @@ html,body{margin:0;height:100%;background:#07100d;color:#fff;font-family:system-
   #hint{bottom:calc(150px + var(--sab))}
   .card{padding:14px 16px}.card h1{font-size:24px}.keys{margin:8px 0 10px}
 }
+
+.diffRow{display:flex;gap:8px;justify-content:center;margin:10px 0 6px;flex-wrap:wrap}
+.diffBtn{border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:10px 14px;min-height:44px;background:rgba(255,255,255,.08);color:#e8f0e8;font:800 12px system-ui,-apple-system,sans-serif;letter-spacing:.04em;cursor:pointer;touch-action:manipulation}
+.diffBtn.sel{background:#e1e6e6;color:#111;border-color:#e1e6e6;box-shadow:0 0 0 2px rgba(225,230,230,.35)}
+#bestLine{margin:4px 0 12px;color:#9fb7ad;font-size:12px;letter-spacing:.04em;min-height:1.2em}
 @media (max-width:420px){.keys{grid-template-columns:1fr}#detWrap{top:calc(96px + var(--sat));width:56vw}}
 </style>
 </head>
@@ -93,6 +98,12 @@ html,body{margin:0;height:100%;background:#07100d;color:#fff;font-family:system-
     <div><b>Touch</b>Joystick: laufen<br>Bildschirm ziehen: Kamera<br>SPRINT halten · BUSCH · AKTION · LAMPE</div>
     <div><b>Tastatur / Maus</b>WASD / Pfeile: laufen · Shift: Sprint<br>Maus ziehen (Doppelklick = Maus fangen)<br>E: Aktion · Q/F: Busch · L: Lampe · M: Ton</div>
   </div>
+  <div class="diffRow" role="group" aria-label="Schwierigkeit">
+    <button type="button" class="diffBtn" data-diff="easy" id="diffEasy">Leicht</button>
+    <button type="button" class="diffBtn" data-diff="normal" id="diffNormal">Normal</button>
+    <button type="button" class="diffBtn" data-diff="hard" id="diffHard">Schwer</button>
+  </div>
+  <p id="bestLine"></p>
   <button id="start" class="primary" type="button" disabled>LÄDT …</button>
 </div></div>
 <div id="endScreen" class="overlay hidden"><div class="card">
